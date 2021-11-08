@@ -351,6 +351,12 @@ if (file_exists(dirname(__FILE__) . "/adminer/drivers/" . $_SERVER["argv"][1] . 
 	array_shift($_SERVER["argv"]);
 }
 
+$needMinifi = false;
+if ($_SERVER["argv"][1] === "0" || $_SERVER["argv"][1] === "false") {
+    $needMinifi = false;
+    array_shift($_SERVER["argv"]);
+}
+
 unset($_COOKIE["adminer_lang"]);
 $_SESSION["lang"] = $_SERVER["argv"][1]; // Adminer functions read language from session
 include dirname(__FILE__) . "/adminer/include/lang.inc.php";
@@ -360,7 +366,7 @@ if (isset($langs[$_SESSION["lang"]])) {
 }
 
 if ($_SERVER["argv"][1]) {
-	echo "Usage: php compile.php [editor] [driver] [lang]\n";
+	echo "Usage: php compile.php [editor] [driver] [need-minifi] [lang]\n";
 	echo "Purpose: Compile adminer[-driver][-lang].php or editor[-driver][-lang].php.\n";
 	exit(1);
 }
@@ -449,7 +455,10 @@ $file = preg_replace('~"\.\./adminer/static/(functions\.js)"~', $replace, $file)
 $file = preg_replace('~\.\./adminer/static/([^\'"]*)~', '" . h(' . $replace . ') . "', $file);
 $file = preg_replace('~"\.\./externals/jush/modules/(jush\.js)"~', $replace, $file);
 $file = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php~", '', $file);
-$file = php_shrink($file);
+
+if ($needMinifi) {
+    $file = php_shrink($file);  
+}
 
 $filename = $project . (preg_match('~-dev$~', $VERSION) ? "" : "-$VERSION") . ($driver ? "-$driver" : "") . ($_SESSION["lang"] ? "-$_SESSION[lang]" : "") . ".php";
 file_put_contents($filename, $file);
