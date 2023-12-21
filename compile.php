@@ -351,9 +351,10 @@ if (file_exists(dirname(__FILE__) . "/adminer/drivers/" . $_SERVER["argv"][1] . 
 	array_shift($_SERVER["argv"]);
 }
 
+
 $needMinifi = true;
-if ($_SERVER["argv"][1] === "0" || $_SERVER["argv"][1] === "false") {
-    $needMinifi = false;
+if ($_SERVER["argv"][1] === "no-minifi" || $_SERVER["argv"][1] === "minifi") {
+    $needMinifi = $_SERVER["argv"][1] === "minifi";
     array_shift($_SERVER["argv"]);
 }
 
@@ -366,7 +367,7 @@ if (isset($langs[$_SESSION["lang"]])) {
 }
 
 if ($_SERVER["argv"][1]) {
-	echo "Usage: php compile.php [editor] [driver] [need-minifi] [lang]\n";
+	echo "Usage: php compile.php [editor] [driver] [no-minifi] [lang]\n";
 	echo "Purpose: Compile adminer[-driver][-lang].php or editor[-driver][-lang].php.\n";
 	exit(1);
 }
