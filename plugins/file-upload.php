@@ -7,14 +7,13 @@
 * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
 * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
 */
-class AdminerFileUpload {
-	/** @access protected */
-	var $uploadPath, $displayPath, $extensions;
+class AdminerFileUpload extends Adminer\Plugin {
+	protected $uploadPath, $displayPath, $extensions;
 
 	/**
-	* @param string prefix for uploading data (create writable subdirectory for each table containing uploadable fields)
-	* @param string prefix for displaying data, null stands for $uploadPath
-	* @param string regular expression with allowed file extensions
+	* @param string $uploadPath prefix for uploading data (create writable subdirectory for each table containing uploadable fields)
+	* @param string $displayPath prefix for displaying data, null stands for $uploadPath
+	* @param string $extensions regular expression with allowed file extensions
 	*/
 	function __construct($uploadPath = "../static/data/", $displayPath = null, $extensions = "[a-zA-Z0-9]+") {
 		$this->uploadPath = $uploadPath;
@@ -36,11 +35,11 @@ class AdminerFileUpload {
 				return false;
 			}
 			//! unlink old
-			$filename = uniqid() . $regs2[0];
+			$filename = (function_exists('random_bytes') ? bin2hex(random_bytes(8)) : uniqid("", true)) . $regs2[0];
 			if (!move_uploaded_file($_FILES[$name]["tmp_name"], "$this->uploadPath$table/$regs[1]-$filename")) {
 				return false;
 			}
-			return q($filename);
+			return Adminer\q($filename);
 		}
 	}
 
@@ -50,4 +49,11 @@ class AdminerFileUpload {
 		}
 	}
 
+	protected $translations = array(
+		'cs' => array('' => 'Políčka končící na "_path" upravuje pomocí <input type="file"> a odkazuje na nahrané soubory z výpisu'),
+		'de' => array('' => 'Bearbeiten Sie Felder, die mit "_path" enden, um <input type="file"> und verknüpfen Sie sie mit den hochgeladenen Dateien beim Select'),
+		'pl' => array('' => 'Edytuj pola kończące się na "_path" za pomocą <input type="file"> i link do przesłanych plików z wybierz'),
+		'ro' => array('' => 'Modificați câmpurile care se termină cu "_path" prin <input type="file"> și creați un link către fișierele încărcate din select'),
+		'ja' => array('' => '列名が "_path" で終わる列を <input type="file"> で変更し、"選択" からアップロードされたファイルにリンク'),
+	);
 }
